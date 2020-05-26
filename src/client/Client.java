@@ -11,6 +11,7 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.Date;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +27,7 @@ public class Client {
         this.sc = sc;
         this.commandManager = commandManager;
         inetSocketAddress = new InetSocketAddress(InetAddress.getByName(host), port);
-        buffer = ByteBuffer.allocate(7777);
+        buffer = ByteBuffer.allocate(port);
         channel = DatagramChannel.open();
         channel.connect(inetSocketAddress);
         date = new Date();
@@ -36,7 +37,12 @@ public class Client {
         String commandName;
         while (true) {
             while (isConnected()) {
-                commandName = sc.next();
+                commandName = null;
+                try {
+                    commandName = sc.next();
+                } catch (NoSuchElementException e) {
+                    System.exit(0);
+                }
                 get(commandName);
             }
         }

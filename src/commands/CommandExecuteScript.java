@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * SpaceMarine.Command to execute commands from a file
+ * SpaceMarine.commands.Command to execute commands from a file
  */
 public class CommandExecuteScript extends Command {
 
@@ -19,6 +19,7 @@ public class CommandExecuteScript extends Command {
         this();
         this.lhm = lhm;
         this.commandManager = commandManager;
+        this.executedFiles = new HashSet<>();
     }
 
     public CommandExecuteScript() {
@@ -30,14 +31,14 @@ public class CommandExecuteScript extends Command {
 
     @Override
     public String execute() {
-        String result;
+        String result = "";
 
         List<String> history = new LinkedList<>();
         FileInputStream fileInputStream;
         try {
             fileInputStream = new FileInputStream(fileName);
         } catch (FileNotFoundException e) {
-            return ("File not found");
+            return ("Syntax: java CommandExecuteScript <filename> | <relative path>");
         }
         Scanner in = new Scanner(new InputStreamReader(fileInputStream));
         // Создать новый файл, если имя файла указано некорректно запросить повторить ввод
@@ -56,16 +57,6 @@ public class CommandExecuteScript extends Command {
             }
             Command cmd = commandManager.getCommand(name);
 
-            if (name.equals("execute_script")) {
-                if (executedFiles.contains(fileName)) {
-                    break;
-                } else {
-                    executedFiles.add(fileName);
-                    CommandExecuteScript commandExecuteScript = (CommandExecuteScript)commandManager.getCommand("execute_script");
-                    commandExecuteScript.setExecutedFiles(executedFiles);
-                    cmd = commandExecuteScript;
-                }
-            }
             try {
                 byte[] output = new byte[10000];
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -74,18 +65,27 @@ public class CommandExecuteScript extends Command {
                 objectOutputStream.flush();
                 output = byteArrayOutputStream.toByteArray();
 
+                if (name.equals("execute_script")) {
+                    if (executedFiles.contains(fileName)) {
+                        continue;
+                    } else {
+                        executedFiles.add(fileName);
+                    }
+                }
+
                 ByteArrayInputStream bais = new ByteArrayInputStream(output);
                 ObjectInputStream ois = new ObjectInputStream(bais);
                 cmd.setParameters(ois);
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
+            } catch (IOException | ClassNotFoundException | IllegalArgumentException e) {
+                result += "Wrong command\n";
+                continue;
             }
 
-            cmd.execute();
+            result += cmd.execute();
             history.add(name);
         }
 
-        return "";
+        return result;
     }
 
     @Override

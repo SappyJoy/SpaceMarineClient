@@ -5,8 +5,10 @@ import item.SpaceMarine;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * When calling this command, displays the entire collection in the console
@@ -25,11 +27,14 @@ public class CommandShow extends Command {
 
     @Override
     public String execute() {
-        StringBuilder result = new StringBuilder();
-        for (int i : lhm.keySet()) {
-            result.append("{\"key\":" + i + ", \"value\":{" + lhm.get(i) + "}\n");
+        if (lhm.size() == 0) {
+            return "Collection is empty";
         }
-        return result.toString();
+        String s = lhm.values().stream()
+                .sorted(Comparator.comparing(SpaceMarine::getName))
+                .map(a -> a.toString() + "\n")
+                .collect(Collectors.joining());
+        return s;
     }
 
     @Override

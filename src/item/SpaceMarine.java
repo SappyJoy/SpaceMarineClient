@@ -4,6 +4,7 @@ import utils.ValidateInput;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -99,7 +100,7 @@ public class SpaceMarine implements Cloneable, Comparable<SpaceMarine>, Serializ
      * Scans element from input stream with invitation to enter
      * @param sc
      */
-    public void scan(Scanner sc) {
+    public void scan(Scanner sc) throws NoSuchElementException {
         ValidateInput in = new ValidateInput(sc);
 
         System.out.print("Input a name: ");

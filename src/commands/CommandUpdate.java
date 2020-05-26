@@ -43,11 +43,12 @@ public class CommandUpdate extends Command {
 
     @Override
     public void readParameters(Scanner sc, ObjectOutputStream oos) throws IOException {
+        System.out.print("Input id: ");
         int id = new ValidateInput(sc).validateInt();
         SpaceMarine sm = new SpaceMarine();
         sm.scan(sc);
         sm.setId(id);
-        oos.writeObject(id);
+        oos.writeInt(id);
         oos.writeObject(sm);
     }
 

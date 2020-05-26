@@ -30,6 +30,7 @@ public class ValidateInput {
 
     public float validateFloat() {
         while (!sc.hasNextFloat()) {
+            System.out.println("Input float number: ");
             printNotValid(sc);
         }
         return sc.nextFloat();
@@ -59,6 +60,7 @@ public class ValidateInput {
         boolean check = false;
         Weapon weapon = null;
         do {
+            System.out.println("Input weapon type (PLASMA_GUN, COMBI_PLASMA_GUN, FLAMER, INFERNO_PISTOL, HEAVY_FLAMER): ");
             String name = sc.next();
             for (Weapon value : Weapon.values()) {
                 if (value.toString().equals(name.toUpperCase())) {

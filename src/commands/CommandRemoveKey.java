@@ -25,7 +25,7 @@ public class CommandRemoveKey extends Command {
     }
 
     public CommandRemoveKey() {
-        this.name = "remove_key key";
+        this.name = "remove_key";
         this.description = "Removes an item from the collection by its key";
     }
 

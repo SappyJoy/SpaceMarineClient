@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
- * SpaceMarine.Command which clear all collection
+ * SpaceMarine.commands.Command which clear all collection
  */
 public class CommandClear extends Command {
     private Map<Integer, SpaceMarine> lhm;
@@ -24,8 +24,9 @@ public class CommandClear extends Command {
 
     @Override
     public String execute() {
+        int count = lhm.size();
         lhm.clear();
-        return "";
+        return count + " items were deleted";
     }
 
     @Override
