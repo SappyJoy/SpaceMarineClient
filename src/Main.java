@@ -26,7 +26,6 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         CommandManager commandManager = new CommandManager();
         addCommands(commandManager);
-        System.out.println("For help, type \"help\"");
 
         Client client = new Client(hostname, port, sc, commandManager);
         client.run();

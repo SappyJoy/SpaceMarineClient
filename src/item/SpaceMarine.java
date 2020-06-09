@@ -13,6 +13,7 @@ import java.util.Scanner;
  */
 public class SpaceMarine implements Cloneable, Comparable<SpaceMarine>, Serializable {
     private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+    private long ownerId;
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
     private static int curId = 0;
@@ -27,6 +28,14 @@ public class SpaceMarine implements Cloneable, Comparable<SpaceMarine>, Serializ
     private Weapon weaponType = null; //Поле может быть null
     private MeleeWeapon meleeWeapon = null; //Поле может быть null
     private Chapter chapter; //Поле не может быть null
+
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public long getOwnerId() {
+        return ownerId;
+    }
 
     public SpaceMarine(String name, Coordinates coordinates, float health, boolean loyal, Weapon weaponType,
                        MeleeWeapon meleeWeapon, Chapter chapter) {
@@ -54,6 +63,54 @@ public class SpaceMarine implements Cloneable, Comparable<SpaceMarine>, Serializ
 
     public String getName() {
         return name;
+    }
+
+    public boolean getLoyal() {
+        return loyal;
+    }
+
+    public MeleeWeapon getMeleeWeapon() {
+        return meleeWeapon;
+    }
+
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCoordinates(Coordinates coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public static void setCurId(int curId) {
+        SpaceMarine.curId = curId;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
+    }
+
+    public void setLoyal(boolean loyal) {
+        this.loyal = loyal;
+    }
+
+    public void setWeaponType(Weapon weaponType) {
+        this.weaponType = weaponType;
+    }
+
+    public void setMeleeWeapon(MeleeWeapon meleeWeapon) {
+        this.meleeWeapon = meleeWeapon;
+    }
+
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
     }
 
     public int getId() {
@@ -116,8 +173,6 @@ public class SpaceMarine implements Cloneable, Comparable<SpaceMarine>, Serializ
         health = in.validateFloat();
         System.out.print("Input loyal(true or false): ");
         loyal = in.validateBool();
-        System.out.print("Input weapon type" +
-                "(PLASMA_GUN, COMBI_PLASMA_GUN, FLAMER, INFERNO_PISTOL, HEAVY_FLAMER): ");
         weaponType = in.validateWeapon();
         System.out.print("Input melee weapon(CHAIN_SWORD, CHAIN_AXE, POWER_BLADE): ");
         meleeWeapon = in.validateMeleeWeapon();
@@ -150,7 +205,7 @@ public class SpaceMarine implements Cloneable, Comparable<SpaceMarine>, Serializ
 
     @Override
     public int compareTo(SpaceMarine spaceMarine) {
-        return id - spaceMarine.id;
+        return name.compareTo(spaceMarine.name);
     }
 }
 

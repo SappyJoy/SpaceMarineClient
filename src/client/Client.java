@@ -2,8 +2,9 @@ package client;
 
 import commands.Command;
 import commands.CommandManager;
+import user.User;
+import user.UserCreator;
 
-import javax.naming.TimeLimitExceededException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -13,7 +14,6 @@ import java.nio.channels.DatagramChannel;
 import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 public class Client {
     private final InetSocketAddress inetSocketAddress;
@@ -22,6 +22,7 @@ public class Client {
     private Scanner sc;
     private CommandManager commandManager;
     private Date date;
+    private User user;
 
     public Client(String host, int port, Scanner sc, CommandManager commandManager) throws IOException {
         this.sc = sc;
@@ -35,6 +36,10 @@ public class Client {
 
     public void run() {
         String commandName;
+        // try to register or log in
+        user = new UserCreator(sc, channel, buffer, inetSocketAddress).create();
+
+        System.out.println("For help, type \"help\"");
         while (true) {
             while (isConnected()) {
                 commandName = null;
@@ -69,6 +74,7 @@ public class Client {
                 System.exit(0);
             }
 
+            objectOutputStream.writeObject(user);
             objectOutputStream.writeObject(cmd);
             cmd.readParameters(sc, objectOutputStream);
             objectOutputStream.flush();
@@ -80,6 +86,11 @@ public class Client {
         } catch (IOException e) {
             close();
         }
+
+        System.out.println(receive(channel, buffer, sendPacket));
+    }
+
+    public static String receive(DatagramChannel channel, ByteBuffer buffer, DatagramPacket sendPacket) {
         try {
             channel.socket().setSoTimeout(1000);
         } catch (SocketException e) {
@@ -93,8 +104,7 @@ public class Client {
                 DatagramPacket receivePacket = new DatagramPacket(buffer.array(), buffer.remaining());
                 channel.socket().receive(receivePacket);
                 String data = new String(receivePacket.getData(), 0, receivePacket.getLength());
-                System.out.println(data.trim());
-                break;
+                return data.trim();
             } catch (IOException e) {
                 long timeNow = System.currentTimeMillis();
                 if (timeNow - timeStart > 10000) {
