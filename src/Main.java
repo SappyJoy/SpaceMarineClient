@@ -1,5 +1,8 @@
 import client.Client;
 import commands.*;
+import gui.MainGui;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 
 import java.io.*;
 import java.net.DatagramPacket;
@@ -8,6 +11,8 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.*;
 
+import static javafx.application.Application.launch;
+
 /**
  *  Class that runs the program. It's responsible for reading commands
  * @author Stepan Ponomaryov
@@ -15,20 +20,25 @@ import java.util.*;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        if (args.length < 2) {
-            System.out.println("Syntax: java Main <hostname> <port-number>");
-            return;
-        }
+//        if (args.length < 2) {
+//            System.out.println("Syntax: java Main <hostname> <port-number>");
+//            return;
+//        }
 
-        String hostname = args[0];
-        int port = Integer.parseInt(args[1]);
+        String hostname = "localhost";
+        int port = 7777;
 
-        Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in).useLocale(Locale.US);
         CommandManager commandManager = new CommandManager();
         addCommands(commandManager);
 
-        Client client = new Client(hostname, port, sc, commandManager);
-        client.run();
+        Client.init(hostname, port, sc, commandManager);
+        Client client = Client.getInstance();
+        new Thread(client::run).start();
+        /*
+            Start gui
+         */
+        new Thread(() -> javafx.application.Application.launch(MainGui.class)).start();
     }
 
     /**

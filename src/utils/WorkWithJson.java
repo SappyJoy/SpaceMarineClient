@@ -28,6 +28,43 @@ public class WorkWithJson {
         makeMapFromJsonString(str);
     }
 
+    public WorkWithJson() {
+        lhm = new LinkedHashMap<>();
+    }
+
+    public static SpaceMarine getSpaceMarine(String str) {
+        JSONObject jsonSm = new JSONObject(str);
+        String jsonSMString = jsonSm.get("SpaceMarine").toString();
+        jsonSm = new JSONObject(jsonSMString);
+        int id = jsonSm.getInt("id");
+        long ownerId = jsonSm.getInt("ownerId");
+        String name = jsonSm.getString("name");
+
+        JSONObject jsonCoordinates = new JSONObject(jsonSm.get("coordinates").toString());
+        int x = jsonCoordinates.getInt("x");
+        int y = jsonCoordinates.getInt("y");
+        Coordinates coordinates = new Coordinates(x, y);
+
+        java.time.LocalDateTime creationDate = LocalDateTime.parse(jsonSm.get("creationDate").toString());
+
+        float health = jsonSm.getFloat("health");
+
+        boolean loyal = jsonSm.getBoolean("loyal");
+
+        Weapon weaponType = Weapon.valueOf(jsonSm.getString("weaponType"));
+
+        MeleeWeapon meleeWeapon = MeleeWeapon.valueOf(jsonSm.getString("meleeWeapon"));
+
+        String jsonSMChapterString = jsonSm.get("chapter").toString();
+        JSONObject jsonChapter = new JSONObject(jsonSMChapterString);
+        String nameChapter = jsonChapter.getString("name");
+        int marinesCount = jsonChapter.getInt("marinesCount");
+        String world = jsonChapter.getString("world");
+        Chapter chapter = new Chapter(nameChapter, marinesCount, world);
+
+        return new SpaceMarine(id, ownerId, name, coordinates, creationDate, health, loyal, weaponType, meleeWeapon, chapter);
+    }
+
     public LinkedHashMap<Integer, SpaceMarine> getLhm() {
         return lhm;
     }

@@ -15,16 +15,19 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class UserCreator {
-    private Scanner in;
-    private DatagramChannel channel;
-    private ByteBuffer buffer;
-    private InetSocketAddress inetSocketAddress;
+    private static Scanner in;
+    private static DatagramChannel channel;
+    private static ByteBuffer buffer;
+    private static InetSocketAddress inetSocketAddress;
 
-    public UserCreator(Scanner in, DatagramChannel channel, ByteBuffer buffer, InetSocketAddress inetSocketAddress) {
-        this.in = in;
-        this.channel = channel;
-        this.buffer = buffer;
-        this.inetSocketAddress = inetSocketAddress;
+    private UserCreator(Scanner in, DatagramChannel channel, ByteBuffer buffer, InetSocketAddress inetSocketAddress) {
+    }
+
+    public static void setUserCreator(Scanner in, DatagramChannel channel, ByteBuffer buffer, InetSocketAddress inetSocketAddress) {
+        UserCreator.in = in;
+        UserCreator.channel = channel;
+        UserCreator.buffer = buffer;
+        UserCreator.inetSocketAddress = inetSocketAddress;
     }
 
     public User create() {
@@ -95,7 +98,42 @@ public class UserCreator {
         return user;
     }
 
-    private DatagramPacket prepareSendPacket(User user) {
+    public static boolean register(String login, String email) {
+        User user = new User();
+        user.setRegistered(false);
+        String answer = "";
+        if (!EmailValidator.validateEmail(email)) {
+            System.out.println("Wrong email");
+            return false;
+        }
+        user.setEmail(email);
+        user.setLogin(login);
+        user.setEntry(true);
+
+        DatagramPacket sendPacket = prepareSendPacket(user);
+        answer = Client.receive(channel, buffer, sendPacket);
+        System.out.println(answer);
+
+        if (!answer.equals("Successful registration"))
+            return false;
+        return true;
+    }
+
+    public static boolean login(String login, String password) {
+        User user = new User();
+        user.setRegistered(true);
+        user.setLogin(login);
+        user.setPassword(password);
+        user.setEntry(true);
+        DatagramPacket sendPacket = prepareSendPacket(user);
+        String answer = Client.receive(channel, buffer, sendPacket);
+        System.out.println(answer);
+        if (answer.equals("Wrong login or password"))
+            return false;
+        return true;
+    }
+
+    private static DatagramPacket prepareSendPacket(User user) {
         DatagramPacket sendPacket = null;
         try {
             buffer.clear();
@@ -113,7 +151,7 @@ public class UserCreator {
         return sendPacket;
     }
 
-    public void close() {
+    public static void close() {
         try {
             channel.socket().disconnect();
             channel.close();

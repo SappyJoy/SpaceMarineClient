@@ -57,6 +57,12 @@ public class SpaceMarine implements Cloneable, Comparable<SpaceMarine>, Serializ
         this.creationDate = creationDate;
     }
 
+    public SpaceMarine(int id, long ownerId, String name, Coordinates coordinates, java.time.LocalDateTime creationDate, float health,
+                       boolean loyal, Weapon weaponType, MeleeWeapon meleeWeapon, Chapter chapter) {
+        this(id, name, coordinates, creationDate, health, loyal, weaponType, meleeWeapon, chapter);
+        this.ownerId = ownerId;
+    }
+
     public SpaceMarine() {
         creationDate = LocalDateTime.now();
     }

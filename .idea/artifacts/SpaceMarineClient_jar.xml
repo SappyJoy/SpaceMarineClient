@@ -3,7 +3,8 @@
     <output-path>$PROJECT_DIR$/out/artifacts/SpaceMarineClient_jar</output-path>
     <root id="archive" name="SpaceMarineClient.jar">
       <element id="module-output" name="SpaceMarineClient" />
-      <element id="extracted-dir" path="$USER_HOME$/Downloads/json-20190722.jar" path-in-jar="/" />
+      <element id="library" level="project" name="json-20190722" />
+      <element id="library" level="project" name="io.github.typhon0:AnimateFX:1.2.1" />
     </root>
   </artifact>
 </component>

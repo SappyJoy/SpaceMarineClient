@@ -2,6 +2,7 @@ package client;
 
 import commands.Command;
 import commands.CommandManager;
+import user.GlobalUser;
 import user.User;
 import user.UserCreator;
 
@@ -12,11 +13,13 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.util.Date;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Client {
-    private final InetSocketAddress inetSocketAddress;
+    private static Client instance;
+    private InetSocketAddress inetSocketAddress;
     private ByteBuffer buffer;
     private DatagramChannel channel;
     private Scanner sc;
@@ -24,7 +27,15 @@ public class Client {
     private Date date;
     private User user;
 
-    public Client(String host, int port, Scanner sc, CommandManager commandManager) throws IOException {
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    private Client(String host, int port, Scanner sc, CommandManager commandManager) throws IOException {
         this.sc = sc;
         this.commandManager = commandManager;
         inetSocketAddress = new InetSocketAddress(InetAddress.getByName(host), port);
@@ -32,14 +43,26 @@ public class Client {
         channel = DatagramChannel.open();
         channel.connect(inetSocketAddress);
         date = new Date();
+        user = GlobalUser.getUser();
+    }
+
+    public static void init(String host, int port, Scanner sc, CommandManager commandManager) throws IOException {
+        instance = new Client(host, port, sc, commandManager);
+    }
+
+    public static Client getInstance() {
+        if (instance == null) {
+            throw new ExceptionInInitializerError();
+        }
+        return instance;
     }
 
     public void run() {
         String commandName;
         // try to register or log in
-        user = new UserCreator(sc, channel, buffer, inetSocketAddress).create();
+        UserCreator.setUserCreator(sc, channel, buffer, inetSocketAddress);
 
-        System.out.println("For help, type \"help\"");
+//        System.out.println("For help, type \"help\"");
         while (true) {
             while (isConnected()) {
                 commandName = null;
@@ -53,7 +76,10 @@ public class Client {
         }
     }
 
-    public void get(String commandName) {
+    public String get(String request) {
+        sc = new Scanner(request).useLocale(Locale.US);
+        user = GlobalUser.getUser();
+        String commandName = sc.next();
         DatagramPacket sendPacket = null;
         try {
             buffer.clear();
@@ -65,7 +91,7 @@ public class Client {
             Command cmd = commandManager.getCommand(commandName);
             if (cmd == null) {
                 System.out.println("Command not found");
-                return;
+                return "";
             }
 
             if (cmd.getName().equals("exit")) {
@@ -87,7 +113,8 @@ public class Client {
             close();
         }
 
-        System.out.println(receive(channel, buffer, sendPacket));
+//        System.out.println(receive(channel, buffer, sendPacket));
+        return receive(channel, buffer, sendPacket);
     }
 
     public static String receive(DatagramChannel channel, ByteBuffer buffer, DatagramPacket sendPacket) {

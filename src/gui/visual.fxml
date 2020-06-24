@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="760.0" prefWidth="240.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.Visual">
+   <children>
+      <Label layoutX="11.0" layoutY="59.0" prefHeight="26.0" prefWidth="65.0" text="ID" />
+      <TextField fx:id="id" editable="false" layoutX="79.0" layoutY="59.0" prefHeight="26.0" prefWidth="158.0" />
+      <Label fx:id="nameLabel" layoutX="11.0" layoutY="99.0" prefHeight="26.0" prefWidth="65.0" text="Name" />
+      <TextField fx:id="name" layoutX="79.0" layoutY="99.0" prefHeight="26.0" prefWidth="158.0" />
+      <Label layoutX="11.0" layoutY="139.0" prefHeight="26.0" prefWidth="65.0" text="X" />
+      <TextField layoutX="79.0" layoutY="139.0" prefHeight="26.0" prefWidth="158.0" fx:id="x" />
+      <Label layoutX="11.0" layoutY="179.0" prefHeight="26.0" prefWidth="65.0" text="Y" />
+      <TextField fx:id="y" layoutX="79.0" layoutY="179.0" prefHeight="26.0" prefWidth="158.0" />
+      <Label fx:id="healthLabel" layoutX="11.0" layoutY="219.0" prefHeight="26.0" prefWidth="65.0" text="Health" />
+      <TextField fx:id="health" layoutX="79.0" layoutY="219.0" prefHeight="26.0" prefWidth="158.0" />
+      <Label fx:id="loyalLabel" layoutX="11.0" layoutY="259.0" prefHeight="26.0" prefWidth="65.0" text="Loyal" />
+      <TextField fx:id="loyal" layoutX="79.0" layoutY="259.0" prefHeight="26.0" prefWidth="158.0" />
+      <Label fx:id="weaponLabel" layoutX="11.0" layoutY="299.0" prefHeight="26.0" prefWidth="65.0" text="Weapon" />
+      <TextField fx:id="weapon" layoutX="79.0" layoutY="299.0" prefHeight="26.0" prefWidth="158.0" />
+      <Label fx:id="meleeWeaponLabel" layoutX="11.0" layoutY="335.0" prefHeight="34.0" prefWidth="65.0" text="Melee Weapon" wrapText="true" />
+      <TextField fx:id="meleeWeapon" layoutX="79.0" layoutY="339.0" prefHeight="26.0" prefWidth="158.0" />
+      <Label fx:id="chapterLabel" layoutX="11.0" layoutY="379.0" prefHeight="26.0" prefWidth="65.0" text="Chapter" />
+      <TextField fx:id="chapter" layoutX="79.0" layoutY="379.0" prefHeight="26.0" prefWidth="158.0" />
+      <Label fx:id="countLabel" layoutX="11.0" layoutY="419.0" prefHeight="26.0" prefWidth="65.0" text="Count" />
+      <TextField fx:id="count" layoutX="79.0" layoutY="419.0" prefHeight="26.0" prefWidth="158.0" />
+      <Label fx:id="worldLabel" layoutX="11.0" layoutY="459.0" prefHeight="26.0" prefWidth="65.0" text="World" />
+      <TextField fx:id="world" layoutX="79.0" layoutY="459.0" prefHeight="26.0" prefWidth="158.0" />
+      <TextArea fx:id="console" layoutX="11.0" layoutY="597.0" prefHeight="91.0" prefWidth="219.0" wrapText="true">
+         <font>
+            <Font name="Monospaced Regular" size="13.0" />
+         </font>
+      </TextArea>
+   </children>
+</AnchorPane>
