@@ -1,8 +1,11 @@
 package gui;
 
 import client.Client;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -38,19 +41,19 @@ public class Visual {
     private Label loyalLabel;
 
     @FXML
-    private TextField loyal;
+    private ComboBox<String> loyal;
 
     @FXML
     private Label weaponLabel;
 
     @FXML
-    private TextField weapon;
+    private ComboBox<String> weapon;
 
     @FXML
     private Label meleeWeaponLabel;
 
     @FXML
-    private TextField meleeWeapon;
+    private ComboBox<String> meleeWeapon;
 
     @FXML
     private Label chapterLabel;
@@ -73,6 +76,12 @@ public class Visual {
     @FXML
     private TextArea console;
 
+    ObservableList<String> booleanList = FXCollections.observableArrayList("true", "false");
+    ObservableList<String> weaponList = FXCollections.observableArrayList(
+            "PLASMA_GUN", "COMBI_PLASMA_GUN", "FLAMER", "INFERNO_PISTOL", "HEAVY_FLAMER");
+    ObservableList<String> meleeWeaponList = FXCollections.observableArrayList(
+            "CHAIN_SWORD", "CHAIN_AXE", "POWER_BLADE");
+
     @FXML
     void initialize() {
         name.setOnAction(event -> {
@@ -87,13 +96,13 @@ public class Visual {
         health.setOnAction(event -> {
             update();
         });
-        loyal.setOnAction(event -> {
+        loyal.setOnMouseClicked(event -> {
             update();
         });
-        weapon.setOnAction(event -> {
+        weapon.setOnMouseClicked(event -> {
             update();
         });
-        meleeWeapon.setOnAction(event -> {
+        meleeWeapon.setOnMouseClicked(event -> {
             update();
         });
         chapter.setOnAction(event -> {
@@ -114,12 +123,15 @@ public class Visual {
         chapterLabel.textProperty().bind(I18N.createStringBinding("chapter"));
         countLabel.textProperty().bind(I18N.createStringBinding("count"));
         worldLabel.textProperty().bind(I18N.createStringBinding("world"));
+        loyal.setItems(booleanList);
+        weapon.setItems(weaponList);
+        meleeWeapon.setItems(meleeWeaponList);
     }
 
     private void update() {
         String request = "update " + id.getText() + " " + name.getText() + " " +
-                x.getText() + " " + y.getText() + " " + health.getText() + " " + loyal.getText() + " " +
-                weapon.getText() + " " + meleeWeapon.getText() + " " + chapter.getText() + " " +
+                x.getText() + " " + y.getText() + " " + health.getText() + " " + loyal.getValue() + " " +
+                weapon.getValue() + " " + meleeWeapon.getValue() + " " + chapter.getText() + " " +
                 count.getText() + " " + world.getText();
         System.out.println(request);
         String answer = Client.getInstance().get(request);
@@ -146,15 +158,15 @@ public class Visual {
         return health;
     }
 
-    public TextField getLoyal() {
+    public ComboBox<String> getLoyal() {
         return loyal;
     }
 
-    public TextField getWeapon() {
+    public ComboBox<String> getWeapon() {
         return weapon;
     }
 
-    public TextField getMeleeWeapon() {
+    public ComboBox<String> getMeleeWeapon() {
         return meleeWeapon;
     }
 

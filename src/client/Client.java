@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Client {
-    private static Client instance;
+    private static volatile Client instance;
     private InetSocketAddress inetSocketAddress;
     private ByteBuffer buffer;
     private DatagramChannel channel;
@@ -39,7 +39,7 @@ public class Client {
         this.sc = sc;
         this.commandManager = commandManager;
         inetSocketAddress = new InetSocketAddress(InetAddress.getByName(host), port);
-        buffer = ByteBuffer.allocate(port);
+        buffer = ByteBuffer.allocate(500000);
         channel = DatagramChannel.open();
         channel.connect(inetSocketAddress);
         date = new Date();
@@ -50,7 +50,7 @@ public class Client {
         instance = new Client(host, port, sc, commandManager);
     }
 
-    public static Client getInstance() {
+    public synchronized static Client getInstance() {
         if (instance == null) {
             throw new ExceptionInInitializerError();
         }
@@ -76,7 +76,7 @@ public class Client {
         }
     }
 
-    public String get(String request) {
+    public synchronized String get(String request) {
         sc = new Scanner(request).useLocale(Locale.US);
         user = GlobalUser.getUser();
         String commandName = sc.next();

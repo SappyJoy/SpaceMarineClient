@@ -17,17 +17,18 @@
          <children>
             <TableView fx:id="table" editable="true" layoutX="400.0" layoutY="4.0" prefHeight="435.0" prefWidth="880.0" stylesheets="@styles/TableViewStyle.css">
               <columns>
-                <TableColumn fx:id="id" editable="false" prefWidth="75.0" text="ID" />
-                <TableColumn fx:id="name" prefWidth="75.0" text="Name" />
-                  <TableColumn prefWidth="75.0" text="X" fx:id="x" />
-                  <TableColumn fx:id="y" prefWidth="75.0" text="Y" />
-                  <TableColumn fx:id="health" prefWidth="75.0" text="Health" />
-                  <TableColumn fx:id="loyal" prefWidth="75.0" text="Loyal" />
-                  <TableColumn fx:id="weapon" prefWidth="75.0" text="Weapon" />
-                  <TableColumn fx:id="meleeWeapon" prefWidth="115.0" text="MeleeWeapon" />
-                  <TableColumn fx:id="chapter" prefWidth="92.0" text="Chapter" />
-                  <TableColumn fx:id="count" prefWidth="58.0" text="Count" />
-                  <TableColumn fx:id="world" prefWidth="89.0" text="World" />
+                <TableColumn fx:id="id" editable="false" prefWidth="47.0" text="ID" />
+                <TableColumn fx:id="name" prefWidth="89.0" text="Name" />
+                  <TableColumn prefWidth="51.0" text="X" fx:id="x" />
+                  <TableColumn fx:id="y" prefWidth="44.0" text="Y" />
+                  <TableColumn fx:id="time" prefWidth="85.0" text="Time" />
+                  <TableColumn fx:id="health" text="Health" />
+                  <TableColumn fx:id="loyal" prefWidth="55.0" text="Loyal" />
+                  <TableColumn fx:id="weapon" prefWidth="94.0" text="Weapon" />
+                  <TableColumn fx:id="meleeWeapon" prefWidth="116.0" text="MeleeWeapon" />
+                  <TableColumn fx:id="chapter" prefWidth="85.0" text="Chapter" />
+                  <TableColumn fx:id="count" prefWidth="57.0" text="Count" />
+                  <TableColumn fx:id="world" prefWidth="76.0" text="World" />
               </columns>
             </TableView>
             <Label fx:id="commandsLabel" layoutX="25.0" layoutY="11.0" text="Commands">
@@ -48,8 +49,11 @@
             <Font name="DejaVu Sans Mono Bold" size="31.0" />
          </font>
       </Label>
-      <Label fx:id="userName" layoutX="221.0" layoutY="35.0" prefHeight="16.0" prefWidth="200.0" />
+      <Label fx:id="userName" layoutX="216.0" layoutY="15.0" prefHeight="16.0" prefWidth="200.0" />
       <Button fx:id="visualButton" layoutX="1105.0" layoutY="18.0" mnemonicParsing="false" style="-fx-background-radius: 20;" stylesheets="@styles/ButtonStyles.css" text="Visual" />
       <Pane fx:id="langPane" layoutY="1.0" prefHeight="61.0" prefWidth="164.0" />
+      <Label layoutX="171.0" layoutY="15.0" text="Login:" />
+      <Label layoutX="171.0" layoutY="43.0" text="Color:" />
+      <Pane fx:id="userColorPane" layoutX="211.0" layoutY="40.0" prefHeight="26.0" prefWidth="39.0" />
    </children>
 </AnchorPane>

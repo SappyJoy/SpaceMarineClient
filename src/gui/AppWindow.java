@@ -2,9 +2,11 @@ package gui;
 
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import client.Client;
 import gui.animations.MouseGestures;
@@ -30,7 +32,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import user.GlobalUser;
-import user.User;
 import utils.AnswerHandler;
 import utils.I18N;
 
@@ -50,6 +51,9 @@ public class AppWindow {
 
     @FXML
     private TableColumn<SpaceMarineAdapter, Long> y;
+
+    @FXML
+    private TableColumn<SpaceMarineAdapter, LocalDateTime> time;
 
     @FXML
     private TableColumn<SpaceMarineAdapter, Float> health;
@@ -96,6 +100,9 @@ public class AppWindow {
     @FXML
     private Label commandsLabel;
 
+    @FXML
+    private Pane userColorPane;
+
     private Stage visualStage;
 
     private boolean isVisualStageShow = false;
@@ -113,8 +120,6 @@ public class AppWindow {
     private Label x1Label = new Label();
     private Label y1Label = new Label();
 
-    private boolean isItemsChanged = false;
-
     private CommandController currentCommand = null;
 
     ObservableList<String> commandsList = FXCollections.observableArrayList(
@@ -126,9 +131,12 @@ public class AppWindow {
     private ExecutorService threadPool;
 
     private Scene currentVisualScene = null;
-    private Group innerRoot;
-    private Set<Circle> currentCircles = null;
+    private volatile Group innerRoot;
+    private volatile Set<Circle> currentCircles;
     private FXMLLoader loader;
+
+    private boolean colorFlag = false;
+    private Color userColor;
 
     @FXML
     void initialize() {
@@ -159,11 +167,18 @@ public class AppWindow {
         innerRoot = new Group();
         userName.setText(GlobalUser.getUser().getLogin());
 
+        visualStage = setupVisualStage(loader);
+        visualStage.setOnCloseRequest(event -> {
+            visualStage.hide();
+            isVisualStageShow = !isVisualStageShow;
+        });
+
         {
             id.setCellValueFactory(new PropertyValueFactory<>("id"));
             name.setCellValueFactory(new PropertyValueFactory<>("name"));
             x.setCellValueFactory(new PropertyValueFactory<>("x"));
             y.setCellValueFactory(new PropertyValueFactory<>("y"));
+            time.setCellValueFactory(new PropertyValueFactory<>("creationDateString"));
             health.setCellValueFactory(new PropertyValueFactory<>("health"));
             loyal.setCellValueFactory(new PropertyValueFactory<>("loyal"));
             weapon.setCellValueFactory(new PropertyValueFactory<>("weapon"));
@@ -174,6 +189,14 @@ public class AppWindow {
             table.setItems(getSpaceMarines());
         }
 
+        Circle userCircle = new Circle(10);
+        userCircle.setCenterX(15);
+        userCircle.setCenterY(12);
+        userCircle.setFill(userColors.get(GlobalUser.getUser().getId()));
+
+        userColorPane.getChildren().add(userCircle);
+
+
         command.setItems(commandsList);
 
         command.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
@@ -181,7 +204,7 @@ public class AppWindow {
             FXMLLoader loader = new FXMLLoader();
             switch (newValue) {
                 case "help": case "show": case "info": case "clear":
-                    case "history": case "print_field_ascending_chapter": {
+                case "history": case "print_field_ascending_chapter": {
                     loader.setLocation(getClass().getResource("/gui/emptyCommand.fxml"));
                     break;
                 }
@@ -229,19 +252,26 @@ public class AppWindow {
         });
 
         table.setOnMouseClicked(event -> {
-            SpaceMarineAdapter sm = table.getSelectionModel().getSelectedItem();
-            command.getSelectionModel().select(4);
-            ((UpdateCommand) currentCommand).setId(sm.getId() + "");
-            ((UpdateCommand) currentCommand).setName(sm.getName());
-            ((UpdateCommand) currentCommand).setX(sm.getX() + "");
-            ((UpdateCommand) currentCommand).setY(sm.getY() + "");
-            ((UpdateCommand) currentCommand).setHealth(sm.getHealth() + "");
-            ((UpdateCommand) currentCommand).setLoyal(sm.isLoyal() + "");
-            ((UpdateCommand) currentCommand).setWeapon(sm.getWeapon());
-            ((UpdateCommand) currentCommand).setMeleeWeapon(sm.getMeleeWeapon());
-            ((UpdateCommand) currentCommand).setChapter(sm.getChapter());
-            ((UpdateCommand) currentCommand).setCount(sm.getCount() + "");
-            ((UpdateCommand) currentCommand).setWorld(sm.getWorld());
+            SpaceMarineAdapter sm = null;
+            try {
+                sm = table.getSelectionModel().getSelectedItem();
+            } catch (NullPointerException e) {
+
+            }
+            if (sm != null) {
+                command.getSelectionModel().select(4);
+                ((UpdateCommand) currentCommand).setId(sm.getId() + "");
+                ((UpdateCommand) currentCommand).setName(sm.getName());
+                ((UpdateCommand) currentCommand).setX(sm.getX() + "");
+                ((UpdateCommand) currentCommand).setY(sm.getY() + "");
+                ((UpdateCommand) currentCommand).setHealth(sm.getHealth() + "");
+                ((UpdateCommand) currentCommand).setLoyal(sm.isLoyal() + "");
+                ((UpdateCommand) currentCommand).setWeapon(sm.getWeapon());
+                ((UpdateCommand) currentCommand).setMeleeWeapon(sm.getMeleeWeapon());
+                ((UpdateCommand) currentCommand).setChapter(sm.getChapter());
+                ((UpdateCommand) currentCommand).setCount(sm.getCount() + "");
+                ((UpdateCommand) currentCommand).setWorld(sm.getWorld());
+            }
         });
 
         executeButton.setOnAction(event -> {
@@ -263,11 +293,6 @@ public class AppWindow {
             }
         });
 
-        visualStage = setupVisualStage(loader);
-        visualStage.setOnCloseRequest(event -> {
-            visualStage.hide();
-            isVisualStageShow = !isVisualStageShow;
-        });
 
         x0Label.setLayoutX(90);
         x0Label.setLayoutY(740);
@@ -291,7 +316,7 @@ public class AppWindow {
             isVisualStageShow = !isVisualStageShow;
         });
 
-        currentCircles = getCircles();
+//        currentCircles = getCircles();
 //        innerRoot.getChildren().addAll(currentCircles);
 
         try {
@@ -308,9 +333,8 @@ public class AppWindow {
         getDataTask = new Task<Boolean>() {
             @Override
             protected Boolean call() throws Exception {
-                boolean flag = true;
                 int i = 0;
-                while (flag) {
+                while (true) {
                     updateTable();
                     try {
                         Thread.sleep(1000);
@@ -318,19 +342,20 @@ public class AppWindow {
                         // Continue
                         System.out.println("Interrupt...");
                     }
-//                    System.out.println("New data " + i);
+                    System.out.println("New data " + i);
                     i++;
                 }
-                return false;
             }
         };
 
-        threadPool.submit(getDataTask);
+//        threadPool.submit(getDataTask);
+        new Thread(getDataTask).start();
     }
 
     private void updateTable() {
         ObservableList<SpaceMarineAdapter> newItems = FXCollections.observableArrayList();
         ObservableList<SpaceMarineAdapter> removeItems = FXCollections.observableArrayList();
+
         ObservableList<SpaceMarineAdapter> currentItems = getSpaceMarines();
 
         for (SpaceMarineAdapter sm : currentItems) {
@@ -345,15 +370,12 @@ public class AppWindow {
         }
         table.getItems().removeAll(removeItems);
         table.getItems().addAll(newItems);
-
-
     }
 
     // Get all elements
     public ObservableList<SpaceMarineAdapter> getSpaceMarines() {
-//        ObservableList<SpaceMarineAdapter> items = FXCollections.observableArrayList();
-
         Set<SpaceMarineAdapter> newItems = new HashSet<>(AnswerHandler.show());
+        boolean isItemsChanged = false;
 
         for (SpaceMarineAdapter newSm : newItems) {
             if (!list.contains(newSm)) {
@@ -362,20 +384,30 @@ public class AppWindow {
             }
         }
 
+        for (SpaceMarineAdapter newSm : list) {
+            if (!newItems.contains(newSm)) {
+                isItemsChanged = true;
+                break;
+            }
+        }
 
         if (isItemsChanged) {
             list = newItems;
             setGridPoints();
             setUserColors();
-            updateCircles();
+            getCircles();
         }
-
 //        items.addAll(list);
 
         return FXCollections.observableArrayList(newItems);
     }
 
     private void setGridPoints() {
+        GRID_X0 = Long.MAX_VALUE;
+        GRID_Y0 = Long.MAX_VALUE;
+        GRID_X1 = Long.MIN_VALUE;
+        GRID_Y1 = Long.MIN_VALUE;
+        HEALTH_MAX = Float.MIN_VALUE;
         for (SpaceMarineAdapter sm : list) {
             GRID_X0 = Math.min(GRID_X0, sm.getX());
             GRID_Y0 = Math.min(GRID_Y0, sm.getY());
@@ -395,6 +427,13 @@ public class AppWindow {
     }
 
     private void setUserColors() {
+        System.out.println(GlobalUser.getUser().getId());
+
+        if (!userColors.containsKey(GlobalUser.getUser().getId())) {
+            userColor = Color.color(Math.random(), Math.random(), Math.random());
+            userColors.put(GlobalUser.getUser().getId(), userColor);
+        }
+
         for (SpaceMarineAdapter sm : list) {
             if (!userColors.containsKey(sm.getOwnerId())) {
                 userColors.put(sm.getOwnerId(), Color.color(Math.random(), Math.random(), Math.random()));
@@ -445,44 +484,42 @@ public class AppWindow {
     }
 
     private Set<Circle> getCircles() {
-        int width = 820;
-        int height = 760;
-        int x0 = 90;
-        int y0 = 30;
-        int x1 = width - 30;
-        int y1 = height - y0;
-
         Set<Circle> circles = new HashSet<>();
-        MouseGestures mg = new MouseGestures();
-        mg.setController(loader.getController());
-
-        for (SpaceMarineAdapter sm : list) {
-            double radius = getRadius(sm.getHealth());
-            Circle circle = new Circle(radius);
-            circle.setFill(userColors.get(sm.getOwnerId()));
-            double x = (double)(sm.getX() - GRID_X0) / (GRID_X1 - GRID_X0) * (x1 - x0) + x0;
-            double y = height - ((double)(sm.getY() - GRID_Y0) / (GRID_Y1 - GRID_Y0) * (y1 - y0) + y0);
-            circle.setCenterX(x);
-            circle.setCenterY(y);
-            circles.add(circle);
-
-            mg.makeClickable(circle, sm);
-        }
-
-        innerRoot.getChildren().removeAll(currentCircles);
-        currentCircles.clear();
-        currentCircles.addAll(circles);
-        innerRoot.getChildren().addAll(currentCircles);
-
-        return circles;
-    }
-
-    // TODO реализовать автоматическое появление вершин на плоскость при обновлении их списка
-    private void updateCircles() {
         if (innerRoot != null) {
-            getCircles();
+            System.out.println("getCircles");
+            int width = 820;
+            int height = 760;
+            int x0 = 90;
+            int y0 = 30;
+            int x1 = width - 30;
+            int y1 = height - y0;
+
+            MouseGestures mg = new MouseGestures();
+            mg.setController(loader.getController());
+
+            for (SpaceMarineAdapter sm : list) {
+                double radius = getRadius(sm.getHealth());
+                Circle circle = new Circle(radius);
+                circle.setFill(userColors.get(sm.getOwnerId()));
+                double x = (double) (sm.getX() - GRID_X0) / (GRID_X1 - GRID_X0) * (x1 - x0) + x0;
+                double y = height - ((double) (sm.getY() - GRID_Y0) / (GRID_Y1 - GRID_Y0) * (y1 - y0) + y0);
+                circle.setCenterX(x);
+                circle.setCenterY(y);
+                circles.add(circle);
+
+                mg.makeClickable(circle, sm);
+            }
+
+
+            innerRoot.getChildren().removeAll(currentCircles);
+            currentCircles.removeAll(currentCircles.stream().filter(circle -> !circles.contains(circle)).collect(Collectors.toSet()));
+            currentCircles.addAll(circles.stream().filter(circle -> !currentCircles.contains(circle)).collect(Collectors.toSet()));
+
+
+            innerRoot.getChildren().addAll(currentCircles);
+
         }
-        isItemsChanged = false;
+        return circles;
     }
 
     private void drawShapes(GraphicsContext gc) {

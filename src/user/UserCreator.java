@@ -119,7 +119,7 @@ public class UserCreator {
         return true;
     }
 
-    public static boolean login(String login, String password) {
+    public static String login(String login, String password) {
         User user = new User();
         user.setRegistered(true);
         user.setLogin(login);
@@ -127,10 +127,10 @@ public class UserCreator {
         user.setEntry(true);
         DatagramPacket sendPacket = prepareSendPacket(user);
         String answer = Client.receive(channel, buffer, sendPacket);
-        System.out.println(answer);
-        if (answer.equals("Wrong login or password"))
-            return false;
-        return true;
+//        if (answer.equals("Wrong login or password"))
+//            return false;
+//        return true;
+        return answer;
     }
 
     private static DatagramPacket prepareSendPacket(User user) {

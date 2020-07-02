@@ -40,9 +40,9 @@ public class MouseGestures {
             controller.getX().setText(String.valueOf(sm.getX()));
             controller.getY().setText(String.valueOf(sm.getY()));
             controller.getHealth().setText(String.valueOf(sm.getHealth()));
-            controller.getLoyal().setText(String.valueOf(sm.isLoyal()));
-            controller.getWeapon().setText(sm.getWeapon());
-            controller.getMeleeWeapon().setText(sm.getMeleeWeapon());
+            controller.getLoyal().setValue(String.valueOf(sm.isLoyal()));
+            controller.getWeapon().setValue(sm.getWeapon());
+            controller.getMeleeWeapon().setValue(sm.getMeleeWeapon());
             controller.getChapter().setText(sm.getChapter());
             controller.getCount().setText(String.valueOf(sm.getCount()));
             controller.getWorld().setText(sm.getWorld());

@@ -3,8 +3,14 @@ package gui;
 import item.MeleeWeapon;
 import item.SpaceMarine;
 import item.Weapon;
+import utils.I18N;
 
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.time.DateTimeException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 
 public class SpaceMarineAdapter {
@@ -25,9 +31,34 @@ public class SpaceMarineAdapter {
         count = spaceMarine.getChapter().getMarinesCount();
         world = spaceMarine.getChapter().getWorld();
         creationDate = spaceMarine.getCreationDate();
+        Locale locale = I18N.getLocale();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+        creationDateString = creationDate.format(dtf);
+        NumberFormat nf = NumberFormat.getNumberInstance();
+        healthString = nf.format(health);
     }
 
+    public String getHealthString() {
+        return healthString;
+    }
+
+    public void setHealthString(String healthString) {
+        this.healthString = healthString;
+    }
+
+    private String healthString;
+
     private LocalDateTime creationDate;
+
+    public String getCreationDateString() {
+        return creationDateString;
+    }
+
+    public void setCreationDateString(String creationDateString) {
+        this.creationDateString = creationDateString;
+    }
+
+    private String creationDateString;
 
     public LocalDateTime getCreationDate() {
         return creationDate;

@@ -64,9 +64,14 @@ public class SignIn {
             String loginText = login.getText().trim();
             String passwordText = password.getText().trim();
 
+            long userId = 0;
             boolean flag = false;
             if (!loginText.equals("") && !passwordText.equals("")) {
-                flag = UserCreator.login(loginText, passwordText);
+                String answer = UserCreator.login(loginText, passwordText);
+                if (!answer.equals("Wrong login or password")) {
+                    flag = true;
+                    userId = Long.parseLong(answer);
+                }
             }
             if (flag) {
                 // Create and give user
@@ -74,6 +79,7 @@ public class SignIn {
                 user.setRegistered(true);
                 user.setLogin(loginText);
                 user.setPassword(passwordText);
+                user.setId(userId);
                 GlobalUser.setUser(user);
 
                 System.out.println("Come in");
