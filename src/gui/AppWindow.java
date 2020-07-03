@@ -2,7 +2,9 @@ package gui;
 
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -12,8 +14,12 @@ import client.Client;
 import gui.animations.MouseGestures;
 import gui.animations.CircleTransition;
 import gui.animations.Shaking;
+import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -103,6 +109,9 @@ public class AppWindow {
     @FXML
     private Pane userColorPane;
 
+    @FXML
+    private TextField filterField;
+
     private Stage visualStage;
 
     private boolean isVisualStageShow = false;
@@ -123,9 +132,9 @@ public class AppWindow {
     private CommandController currentCommand = null;
 
     ObservableList<String> commandsList = FXCollections.observableArrayList(
-            "help", "info", "show", "insert", "update", "remove_key", "clear", "execute_script",
+            "help", "info", "insert", "update", "remove_key", "clear", "execute_script",
             "remove_greater", "remove_lower", "print_field_ascending_chapter", "history", "count_by_weapon_type",
-            "filter_less_than_health");
+            "show", "filter_less_than_health");
 
     private Task<Boolean> getDataTask;
     private ExecutorService threadPool;
@@ -137,6 +146,9 @@ public class AppWindow {
 
     private boolean colorFlag = false;
     private Color userColor;
+
+    ObservableList<SpaceMarineAdapter> items = FXCollections.observableArrayList();
+    FilteredList<SpaceMarineAdapter> filteredData;
 
     @FXML
     void initialize() {
@@ -151,6 +163,7 @@ public class AppWindow {
         executeButton.textProperty().bind(I18N.createStringBinding("execute"));
         commandsLabel.textProperty().bind(I18N.createStringBinding("commands"));
         name.textProperty().bind(I18N.createStringBinding("name"));
+        time.textProperty().bind(I18N.createStringBinding("time"));
         health.textProperty().bind(I18N.createStringBinding("health"));
         loyal.textProperty().bind(I18N.createStringBinding("loyal"));
         weapon.textProperty().bind(I18N.createStringBinding("weapon"));
@@ -178,7 +191,7 @@ public class AppWindow {
             name.setCellValueFactory(new PropertyValueFactory<>("name"));
             x.setCellValueFactory(new PropertyValueFactory<>("x"));
             y.setCellValueFactory(new PropertyValueFactory<>("y"));
-            time.setCellValueFactory(new PropertyValueFactory<>("creationDateString"));
+            time.setCellValueFactory(new PropertyValueFactory<>("creationDate"));
             health.setCellValueFactory(new PropertyValueFactory<>("health"));
             loyal.setCellValueFactory(new PropertyValueFactory<>("loyal"));
             weapon.setCellValueFactory(new PropertyValueFactory<>("weapon"));
@@ -188,6 +201,68 @@ public class AppWindow {
             world.setCellValueFactory(new PropertyValueFactory<>("world"));
             table.setItems(getSpaceMarines());
         }
+        time.setCellFactory(column -> {
+            TableCell<SpaceMarineAdapter, LocalDateTime> cell = new TableCell<SpaceMarineAdapter, LocalDateTime>() {
+                private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy", Locale.getDefault());
+
+                @Override
+                protected void updateItem(LocalDateTime item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
+                    } else {
+                        setText(dtf.format(item));
+                    }
+                }
+            };
+
+            return cell;
+        });
+//        time.cellFactoryProperty().bindBidirectional();
+
+        // Создания фильтрации таблицы
+        filteredData = new FilteredList<SpaceMarineAdapter>(items, b -> true);
+
+        filterField.textProperty().addListener(((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(spaceMarineAdapter -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                String lowerCaseFilter = newValue.toLowerCase();
+                if (spaceMarineAdapter.getName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (String.valueOf(spaceMarineAdapter.getX()).contains(lowerCaseFilter)) {
+                    return true;
+                } else if (String.valueOf(spaceMarineAdapter.getY()).contains(lowerCaseFilter)) {
+                    return true;
+                } else if (String.valueOf(spaceMarineAdapter.getCreationDate()).contains(lowerCaseFilter)) {
+                    return true;
+                } else if (String.valueOf(spaceMarineAdapter.getHealth()).contains(lowerCaseFilter)) {
+                    return true;
+                } else if (String.valueOf(spaceMarineAdapter.isLoyal()).contains(lowerCaseFilter)) {
+                    return true;
+                } else if (spaceMarineAdapter.getWeapon().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (spaceMarineAdapter.getMeleeWeapon().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (spaceMarineAdapter.getChapter().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (String.valueOf(spaceMarineAdapter.getCount()).contains(lowerCaseFilter)) {
+                    return true;
+                } else if (spaceMarineAdapter.getWorld().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+        }));
+
+        SortedList<SpaceMarineAdapter> sortedData = new SortedList<>(filteredData);
+
+        sortedData.comparatorProperty().bind(table.comparatorProperty());
+
+        table.setItems(sortedData);
 
         Circle userCircle = new Circle(10);
         userCircle.setCenterX(15);
@@ -259,7 +334,7 @@ public class AppWindow {
 
             }
             if (sm != null) {
-                command.getSelectionModel().select(4);
+                command.getSelectionModel().select(3);
                 ((UpdateCommand) currentCommand).setId(sm.getId() + "");
                 ((UpdateCommand) currentCommand).setName(sm.getName());
                 ((UpdateCommand) currentCommand).setX(sm.getX() + "");
@@ -335,14 +410,19 @@ public class AppWindow {
             protected Boolean call() throws Exception {
                 int i = 0;
                 while (true) {
-                    updateTable();
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateTable();
+                        }
+                    });
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         // Continue
                         System.out.println("Interrupt...");
                     }
-                    System.out.println("New data " + i);
+//                    System.out.println("New data " + i);
                     i++;
                 }
             }
@@ -359,17 +439,17 @@ public class AppWindow {
         ObservableList<SpaceMarineAdapter> currentItems = getSpaceMarines();
 
         for (SpaceMarineAdapter sm : currentItems) {
-            if (!table.getItems().contains(sm)) {
+            if (!items.contains(sm)) {
                 newItems.add(sm);
             }
         }
-        for (SpaceMarineAdapter sm : table.getItems()) {
+        for (SpaceMarineAdapter sm : items) {
             if (!currentItems.contains(sm)) {
                 removeItems.add(sm);
             }
         }
-        table.getItems().removeAll(removeItems);
-        table.getItems().addAll(newItems);
+        items.removeAll(removeItems);
+        items.addAll(newItems);
     }
 
     // Get all elements
@@ -427,7 +507,7 @@ public class AppWindow {
     }
 
     private void setUserColors() {
-        System.out.println(GlobalUser.getUser().getId());
+//        System.out.println(GlobalUser.getUser().getId());
 
         if (!userColors.containsKey(GlobalUser.getUser().getId())) {
             userColor = Color.color(Math.random(), Math.random(), Math.random());
@@ -461,8 +541,6 @@ public class AppWindow {
         GraphicsContext context = canvas.getGraphicsContext2D();
         drawShapes(context);
 
-        // TODO Это должно быть в отдельном методе, чтобы при обновлении вершин оно тоже менялось
-
         Label xLabel = new Label("X");
         xLabel.setLayoutX(820);
         xLabel.setLayoutY(730);
@@ -486,7 +564,7 @@ public class AppWindow {
     private Set<Circle> getCircles() {
         Set<Circle> circles = new HashSet<>();
         if (innerRoot != null) {
-            System.out.println("getCircles");
+//            System.out.println("getCircles");
             int width = 820;
             int height = 760;
             int x0 = 90;

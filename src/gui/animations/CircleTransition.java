@@ -16,7 +16,7 @@ public class CircleTransition {
         transition.setFromX(90 - node.getCenterX());
         transition.setToX(0);
         transition.setToY(0);
-        transition.setDuration(Duration.seconds(3));
+        transition.setDuration(Duration.seconds(1 + Math.random() * 2));
     }
 
     public void playAnimation() {

@@ -76,6 +76,12 @@ public class Visual {
     @FXML
     private TextArea console;
 
+    @FXML
+    private Label dateLabel;
+
+    @FXML
+    private TextField date;
+
     ObservableList<String> booleanList = FXCollections.observableArrayList("true", "false");
     ObservableList<String> weaponList = FXCollections.observableArrayList(
             "PLASMA_GUN", "COMBI_PLASMA_GUN", "FLAMER", "INFERNO_PISTOL", "HEAVY_FLAMER");
@@ -116,6 +122,7 @@ public class Visual {
         });
 
         nameLabel.textProperty().bind(I18N.createStringBinding("name"));
+        dateLabel.textProperty().bind(I18N.createStringBinding("time"));
         healthLabel.textProperty().bind(I18N.createStringBinding("health"));
         loyalLabel.textProperty().bind(I18N.createStringBinding("loyal"));
         weaponLabel.textProperty().bind(I18N.createStringBinding("weapon"));
@@ -152,6 +159,10 @@ public class Visual {
 
     public TextField getY() {
         return y;
+    }
+
+    public TextField getDate() {
+        return date;
     }
 
     public TextField getHealth() {

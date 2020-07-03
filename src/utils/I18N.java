@@ -1,9 +1,11 @@
 package utils;
 
+import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -13,6 +15,9 @@ import javafx.scene.control.Label;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -71,6 +76,11 @@ public final class I18N {
 
     public static StringBinding createStringBinding(Callable<String> func) {
         return Bindings.createStringBinding(func, locale);
+    }
+
+    public static String createDateBinding(LocalDateTime localDateTime) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+        return dtf.format(localDateTime);
     }
 
     public static Label labelForValue(Callable<String> func) {

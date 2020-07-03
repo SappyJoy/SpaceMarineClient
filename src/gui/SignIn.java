@@ -94,6 +94,7 @@ public class SignIn {
                 new FadeIn(root).play();
                 Stage stage = (Stage) signUpButton.getScene().getWindow();
                 stage.setScene(new Scene(root));
+                stage.setResizable(false);
             } else {
                 Shaking loginAnimation = new Shaking(login);
                 Shaking passwordAnimation = new Shaking(password);

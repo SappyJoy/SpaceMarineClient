@@ -39,6 +39,7 @@ public class MouseGestures {
             controller.getName().setText(sm.getName());
             controller.getX().setText(String.valueOf(sm.getX()));
             controller.getY().setText(String.valueOf(sm.getY()));
+            controller.getDate().setText(String.valueOf(sm.getCreationDateString()));
             controller.getHealth().setText(String.valueOf(sm.getHealth()));
             controller.getLoyal().setValue(String.valueOf(sm.isLoyal()));
             controller.getWeapon().setValue(sm.getWeapon());

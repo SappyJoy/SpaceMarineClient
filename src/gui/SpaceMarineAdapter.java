@@ -32,7 +32,7 @@ public class SpaceMarineAdapter {
         world = spaceMarine.getChapter().getWorld();
         creationDate = spaceMarine.getCreationDate();
         Locale locale = I18N.getLocale();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", Locale.getDefault());
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault());
         creationDateString = creationDate.format(dtf);
         NumberFormat nf = NumberFormat.getNumberInstance();
         healthString = nf.format(health);

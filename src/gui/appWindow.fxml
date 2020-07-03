@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
@@ -15,7 +16,7 @@
    <children>
       <AnchorPane layoutY="77.0" prefHeight="667.0" prefWidth="1280.0" style="-fx-background-color: #FFF;">
          <children>
-            <TableView fx:id="table" editable="true" layoutX="400.0" layoutY="4.0" prefHeight="435.0" prefWidth="880.0" stylesheets="@styles/TableViewStyle.css">
+            <TableView fx:id="table" editable="true" layoutX="400.0" layoutY="37.0" prefHeight="402.0" prefWidth="880.0" stylesheets="@styles/TableViewStyle.css">
               <columns>
                 <TableColumn fx:id="id" editable="false" prefWidth="47.0" text="ID" />
                 <TableColumn fx:id="name" prefWidth="89.0" text="Name" />
@@ -37,12 +38,14 @@
                </font>
             </Label>
             <ComboBox fx:id="command" layoutX="25.0" layoutY="40.0" prefHeight="26.0" prefWidth="200.0" promptText="Command" />
-            <TextArea fx:id="console" layoutX="14.0" layoutY="453.0" prefHeight="190.0" prefWidth="1250.0">
+            <TextArea fx:id="console" editable="false" layoutX="14.0" layoutY="453.0" prefHeight="190.0" prefWidth="1250.0">
                <font>
                   <Font name="Monospaced Regular" size="13.0" />
                </font></TextArea>
             <VBox fx:id="commandValues" layoutX="15.0" layoutY="70.0" prefHeight="380.0" prefWidth="380.0" />
             <Button fx:id="executeButton" layoutX="232.0" layoutY="40.0" mnemonicParsing="false" style="-fx-background-radius: 20;" stylesheets="@styles/ButtonStyles.css" text="Execute" />
+            <Label layoutX="400.0" layoutY="6.0" prefHeight="26.0" prefWidth="58.0" text="Filter" />
+            <TextField fx:id="filterField" layoutX="458.0" layoutY="6.0" prefHeight="26.0" prefWidth="212.0" />
          </children></AnchorPane>
       <Label layoutX="444.0" layoutY="23.0" text="Space Marine Database">
          <font>

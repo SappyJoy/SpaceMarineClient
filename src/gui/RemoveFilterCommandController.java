@@ -88,7 +88,7 @@ public class RemoveFilterCommandController implements CommandController {
         healthLabel.textProperty().bind(I18N.createStringBinding("health"));
         loyalLabel.textProperty().bind(I18N.createStringBinding("loyal"));
         weaponLabel.textProperty().bind(I18N.createStringBinding("weapon"));
-        meleeWeaponLabel.textProperty().bind(I18N.createStringBinding("meleeWeapon"));
+        meleeWeaponLabel.textProperty().bind(I18N.createStringBinding("melee_weapon"));
         chapteLabel.textProperty().bind(I18N.createStringBinding("chapter"));
         countLabel.textProperty().bind(I18N.createStringBinding("count"));
         worldLabel.textProperty().bind(I18N.createStringBinding("world"));
